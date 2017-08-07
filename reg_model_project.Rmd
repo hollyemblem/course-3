@@ -426,7 +426,7 @@ ggplot(data = newmodel, aes(x = .resid)) +
   xlab("Residuals")
 ```
 
-There is some concern that the residuals do dip at the beginning in the scatter plot. However, we do not set a fan shape or anything which indicates an underlying relationship between the variables.
+There is some concern that the residuals do dip at the beginning in the scatter plot. However, we do not see a fan shape or anything which indicates an underlying relationship between the variables.
 
 Based on the above and with our reservations in mind, we now have a model which can explain 67.15% of the variability of the response data.
 
