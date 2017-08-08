@@ -61,7 +61,7 @@ We can see that the data is left skewed, which should mean that our mean is less
 ```{r}
 summary(movies$imdb_rating)
 ```
-Essentially, this means that a movie will score around 6.5 on IMDB. This is helpful for us to bear in mind when it comes to our later modelling.
+Essentially, this means that the median for movie ratings on iMDB is 6.6. This is helpful for us to bear in mind when it comes to our later modelling.
 
 
 However, what we also need to note here is that IMDB's ratings are defined by users who vote on a movie. Therefore, if a movie could be rated very highly from just 5-6 votes. We therefore also need to understand the distribution of votes across movies:
