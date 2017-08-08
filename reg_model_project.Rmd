@@ -12,9 +12,12 @@ output:
 ### Load packages
 
 ```{r load-packages, message = FALSE}
+oldw <- getOption("warn")
+options(warn = -1)
 library(ggplot2)
 library(dplyr)
 library(statsr)
+options(warn = oldw)
 ```
 
 ### Load data
@@ -28,9 +31,9 @@ load("movies.Rdata")
 * * *
 
 ## Part 1: Data
-There are 651 randomly sampled movies in the IMDB dataset. As random sampling was used and the sample size is sufficiently large, but obviously less than 10% of all movies on IMDB (there are 1,523,191 non-TV episode titles according to these database statistics: http://www.imdb.com/stats), we can feel confident that this sample is representative of the population, with population in this instance being all movies on IMDB.
+There are 651 randomly sampled movies in the IMDB dataset. As simple random sampling was used and the sample size is sufficiently large, but obviously less than 10% of all movies on IMDB (there are over a million non-TV episode titles according to these database statistics: http://www.imdb.com/stats), we can feel confident that this sample is representative of the population, with population in this instance being all movies on IMDB.
 
-It is worth noting that this data does not come from an experiment, but rather an observational study. Therefore, we cannot suggest any causality from our findings. 
+It is worth noting that this data does not come from an experiment, but rather an observational study. Therefore, we cannot make any causal assertions from our findings.
 
 * * *
 
@@ -164,6 +167,8 @@ We'll now start with our full model, which will include the following metrics:
 * best_dir_win
 * mpaa_rating
 * audience_rating
+
+#### Excluding Variables
 
 We have to be careful of collinearity with the variables provided. For example, there is little point in including critics_rating alongside critics_score, as a high scoring movie will have a rating of fresh, whereas a low will have a rating of rotten. By including both variables, we stand to not learn anything new.
 
@@ -390,6 +395,8 @@ newmodel <- lm(imdb_rating  ~ genre + critics_score + audience_rating + top200_b
 summary(newmodel)
 ```
 
+#### Model Diagnostics
+
 Now we have our model, we want to be able to confident that it meets the requirements for multilinear regression. Namely:
 
 1. The residuals of the model are nearly normal
@@ -428,7 +435,20 @@ ggplot(data = newmodel, aes(x = .resid)) +
 
 There is some concern that the residuals do dip at the beginning in the scatter plot. However, we do not see a fan shape or anything which indicates an underlying relationship between the variables.
 
-Based on the above and with our reservations in mind, we now have a model which can explain 67.15% of the variability of the response data.
+#### Model Coefficients
+
+Based on the above and with our reservations in mind, we now have a model which can explain 67.15% of the variability of the response data. We can also make some interpretations with regards to the coefficients of the mode.
+
+```{r}
+summary(newmodel)$coefficients
+```
+
+All else held constant, the model predicts that for each unit increase in IMDB score, the score for documentary films will be higher on average by 0.53.
+
+In comparison, all else held constant, the model predicts that for each unit increase in IMDB score, the score for animation films will be lower on average by 0.58.
+
+Finally, the model also predicts that, all else hold constant, for each unit increase in IMDB score, the score for movies with an Upright popcorn rating on Rotten Tomaties will be higher on average by 0.73.
+
 
 * * *
 
@@ -446,6 +466,7 @@ underworld <- data.frame(genre = "Action & Adventure", critics_score = 18, audie
 ```{r}
 predict(newmodel, underworld)
 ```
+#### Confidence Interval for Prediction
 
 The model has predicted an IMDB rating of 5.16 for Underworld: Blood Wars. We can also construct a 95% confidence interval around the prediction:
 
@@ -487,16 +508,6 @@ We can inform our boss that there is a moderately strong relationship between an
 
 and that we have created a model which explains 67.15% of the variability of the response data. Our boss can then use this data for forthcoming movies to model their potential rating on IMDB.
 
-We can also interpret the slopes for genre, for example:
-
-```{r}
-summary(newmodel)$coefficients
-```
-
-All else held constant, the model predicts that for each unit increase in IMDB score, the score for documentary films will be higher on average by 0.53.
-
-In comparison, all else held constant, the model predicts that for each unit increase in IMDB score, the score for animation films will be lower on average by 0.58.
-
 
 We can also tell our boss that the following genres, for example, are likely to have a positive impact on ratings:
 
@@ -506,6 +517,7 @@ We can also tell our boss that the following genres, for example, are likely to 
 We can recommend to our boss that she takes a look at what we'll be producing in these areas, given that from our sample, Paramount Pictures didn't have any Art House or Documentary movies.
 
 
-We can also tell our boss that the whether or not the director of the movie ever won an Oscar decreased the accuracy of our model, according to adjusted R-squared.. We should make clear to our boss that this doesn't mean she should hire no-name directors (or pass up the chance to work with Spielberg!) but it is an interesting fact about the success of a movie in our model that she might not have known.
+We can also tell our boss that the whether or not the director of the movie ever won an Oscar decreased the accuracy of our model, according to adjusted R-squared. We should make clear to our boss that this doesn't mean she should hire no-name directors (or pass up the chance to work with Spielberg!) but it is an interesting fact about the success of a movie in our model that she might not have known.
 
+#### Shortcomings
 Finally, we will also tell our boss about some of the shortcomings of the model. Namely that: While multilinear regression is often the first step in the road to causation, we cannot prove any causality at the moment.
